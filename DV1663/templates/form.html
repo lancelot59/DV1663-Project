@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Myth</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='Style.css') }}">
+</head>
+<body>
+    <table id="my-table">
+        <thead>
+            <tr>
+                <th>Gods</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for god in gods %}
+            <tr data-name="{{ god }}">
+                <td>{{ god }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <div id="extended"><button id="close">X</button><div id="details"></div></div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

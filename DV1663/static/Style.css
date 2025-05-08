@@ -1,0 +1,47 @@
+body {
+    background-color: #2b2040;
+}
+table {
+    margin: auto;
+    background: #ccc;
+    display: table;
+    width: 50em;
+}
+table th {
+    font-size: 1.4em;
+}
+thead tr {
+    margin: 0.5em 0 0;
+    background-color: #ccc; /* For browsers that do not support gradients */
+    background-image: linear-gradient(#ccc 95%, #000);
+}
+tr td {
+    padding: 0.2em 1em;
+}
+table tr {
+    font-size: 1.1em;
+    display: table-row;
+}
+table tr:nth-child(2n) {
+    background-color: #eee;
+}
+tbody tr:hover {
+    background-color: rgb(150, 150, 209);
+}
+
+
+/* ---===--- Popup window ---===--- */
+
+#extended {
+    display: none;
+    position: absolute;
+
+    margin: auto;
+    background: #ccc;
+    width: 50%;
+    left: 25%;
+    top: 5%;
+}
+#extended.Visable {
+    display: block;
+}
