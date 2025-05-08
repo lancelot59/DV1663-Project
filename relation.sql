@@ -1,4 +1,4 @@
-INSERT INTO relation (Main_character, God, Relation) 
+INSERT OR REPLACE INTO relation (Main_character, God, Relation) 
 VALUES
 ('Achilles', 'Thetis', 'Mother'),
 
