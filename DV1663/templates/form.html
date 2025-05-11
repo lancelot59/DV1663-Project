@@ -9,12 +9,16 @@
         <thead>
             <tr>
                 <th>Gods</th>
+                <th>Nr. Main Characters</th>
+                <th>Nr. of adventures effected</th>
             </tr>
         </thead>
         <tbody>
             {% for god in gods %}
-            <tr data-name="{{ god }}">
-                <td>{{ god }}</td>
+            <tr data-name="{{ god[0] }}">
+                <td>{{ god[0] }}</td>
+                <td>{{ god[1] }}</td>
+                <td>{{ god[2] }}</td>
             </tr>
             {% endfor %}
         </tbody>
