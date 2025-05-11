@@ -9,8 +9,13 @@ app = Flask(__name__)
 def get_gods():
     conn = sqlite3.connect('projekt_dv1663.db')
     cursor = conn.cursor()
-    cursor.execute("SELECT name FROM gods")
-    gods = [row[0] for row in cursor.fetchall()]
+    cursor.execute( """SELECT g.name AS God, COUNT(r.Main_character) AS Number_of_Heroes, COUNT(h.ID) AS Helps_or_Hinders
+                        FROM gods g
+                        LEFT JOIN relation r ON g.name = r.God
+                        LEFT JOIN help_or_hinder h ON g.name = h.name
+                        GROUP BY g.name
+                        ORDER BY Number_of_Heroes DESC;""")
+    gods = cursor.fetchall()
     conn.close()
     return gods
 
