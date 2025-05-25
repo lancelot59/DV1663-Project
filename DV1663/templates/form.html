@@ -69,7 +69,32 @@
         <!-- Adventures Tab -->
         <div class="tab-pane fade" id="adventures" role="tabpanel">
             <h3>Adventures</h3>
-            <div id="adventures-table"></div>
+            <h3 class="mt-5">Add a New Adventure</h3>
+                <form id="adventure-form">
+                    <div class="col-md-6">
+                        <input type="text" id="adventure_name" class="form-control" placeholder="Adventure Name">
+                    </div>
+                    <div class="col-md-6">
+                        <input type="text" id="adventure_goal" class="form-control" placeholder="Goal">
+                    </div>
+                    <div class="col-12">
+                        <textarea id="adventure_brief" class="form-control" placeholder="Brief Description"></textarea>
+                    </div>
+                    <div class="col-12">
+                        <input type="text" id="adventure_heroes" class="form-control" placeholder="Heroes (comma-separated)">
+                    </div>
+                    <div class="col-12">
+                        <input type="text" id="adventure_gods" class="form-control" placeholder="Gods (e.g. Athena:true, Hera:false)">
+                    </div>
+                    <div class="col-12">
+                        <button class="btn btn-primary" onclick="submitAdventure(event)">Add Adventure</button>
+                    </div>
+                    <div class="col-12">
+                        <div id="response" class="text-success mt-2"></div>
+                    </div>
+                </form>
+                <h3>Adventures</h3>
+                <div id="adventures-table"></div>
         </div>
         <!-- side characters Tab -->
         <div class="tab-pane fade" id="side_characters" role="tabpanel">
@@ -79,7 +104,7 @@
     </div>
     <!-- Second tab section for join tables -->
     <hr>
-    <h2 class="mt-5">Data Insights & Summaries</h2>
+    <h3 class="mt-5">Data Insights & Summaries</h3>
 
     <ul class="nav nav-tabs" id="summaryTabs" role="tablist">
         <li class="nav-item">
@@ -259,7 +284,51 @@ function loadGodInterventions() {
         });
 }
 
+document.getElementById("adventure-form").addEventListener("submit", async function(event) {
+    event.preventDefault();
 
+    const name = document.getElementById("adventure_name").value;
+    const goal = document.getElementById("adventure_goal").value;
+    const brief = document.getElementById("adventure_brief").value;
+
+    const heroesRaw = document.getElementById("adventure_heroes").value;
+    const heroes = heroesRaw.split(",").map(h => h.trim()).filter(Boolean);
+
+    const godsRaw = document.getElementById("adventure_gods").value;
+    const gods = {};
+    godsRaw.split(",").forEach(entry => {
+        let [god, action] = entry.split(":").map(s => s.trim().toLowerCase());
+        if (god && (action === "helps" || action === "hinders")) {
+            gods[god] = { does: action };
+        }
+    });
+
+    const data = {
+        name,
+        goal,
+        brief,
+        heroes,
+        gods
+    };
+
+    const responseBox = document.getElementById("response");
+
+    try {
+        const res = await fetch("/add_adventure", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+
+        const result = await res.text();
+        responseBox.innerText = result;
+    } catch (err) {
+        responseBox.innerText = "Failed to submit adventure.";
+        console.error(err);
+    }
+});
 </script>
 </body>
 </html>

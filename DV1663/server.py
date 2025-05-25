@@ -18,15 +18,6 @@ def get_gods_adventures():
     conn.close()
     return gods
 
-def get_details(item_id):
-    conn = sqlite3.connect('projekt_dv1663.db')
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM gods WHERE name = ?", (item_id,))
-    row = [tuple(elements) for elements in cursor.fetchall()]
-    conn.close()
-    return row
-
 def get_main_char_adventures():
     conn = sqlite3.connect('projekt_dv1663.db')
     cursor = conn.cursor()
@@ -172,6 +163,47 @@ def get_gods():
     conn.close()
     return data
 
+def add_adventure(adventure_data):
+    conn = sqlite3.connect('projekt_dv1663.db')
+    cursor = conn.cursor()
+    try:
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+        print(cursor.fetchall())
+
+        cursor.execute("""
+                        INSERT OR REPLACE INTO adventures (Goal, Brief, name)
+                        VALUES (?, ?, ?)
+                        """, (adventure_data['goal'], adventure_data['brief'], adventure_data['name']))
+        
+        adventure_id = cursor.lastrowid
+        if adventure_id is None:
+            adventure_id = adventure_data['name']
+        for hero in adventure_data.get('heroes', []):
+            cursor.execute("""
+                           INSERT INTO goes (Main_character, Adventure)
+                           VALUES (?, ?)
+                           """, (hero, adventure_data['name']))
+        # Assuming 'adventure_data' is already a Python dict from the JSON body
+        gods_data = adventure_data.get("gods", {})
+
+        # Insert each god-action pair into the help_or_hinder table
+        for god, info in gods_data.items():
+            action = info.get("does")  # should be 'helps' or 'hinders'
+            if action in ("helps", "hinders"):
+                cursor.execute("""
+                    INSERT INTO help_or_hinder (Name, ID, does)
+                    VALUES (?, ?, ?)
+                """, (god, hero, action))  # 'hero' must be defined in the loop/context
+
+
+        conn.commit()
+        print("success!")
+    except sqlite3.Error as e:
+        conn.rollback()
+        print("Error during adventure insertion: ", e)
+    finally:
+        conn.close()
+
 # Routes
 @app.route('/')
 def form():
@@ -215,12 +247,15 @@ def side_characters():
 def gods():
     return jsonify(get_gods())
 
-@app.route('/details/<item_id>')
-def details(item_id):
-    return jsonify(get_details(item_id))
-
-
-
+@app.route("/add_adventure", methods=["POST"])
+def add_adventure_route():
+    data = request.get_json()
+    try:
+        add_adventure(data)
+        return "Adventure added successfully"
+    except Exception as e:
+        print("error: ", e)
+        return "failed to add adventure: {e}", 500
 
 
 if __name__ == '__main__':
