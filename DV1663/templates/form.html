@@ -38,6 +38,30 @@
 
         <!-- Main Characters Tab -->
         <div class="tab-pane fade" id="characters" role="tabpanel">
+            <h3 class="mt-5">Add a Main Character</h3>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <input type="text" id="name" class="form-control" placeholder="Name">
+                </div>
+                <div class="col-md-6">
+                    <input type="text" id="father_name" class="form-control" placeholder="Father Name">
+                </div>
+                <div class="col-md-6">
+                    <input type="text" id="alias" class="form-control" placeholder="Alias">
+                </div>
+                <div class="col-md-6">
+                    <input type="text" id="trait" class="form-control" placeholder="Trait">
+                </div>
+                <div class="col-md-6">
+                    <input type="text" id="weapon" class="form-control" placeholder="Weapon">
+                </div>
+                <div class="col-md-6">
+                    <input type="text" id="skill" class="form-control" placeholder="Skill">
+                </div>
+            </div>
+            <button class="btn btn-success mt-3" onclick="addMainCharacter()">Add Character</button>
+            <div id="add-result" class="mt-2 text-success"></div>
+
             <h3>Main Characters</h3>
             <div id="characters-table"></div>
         </div>
@@ -138,6 +162,38 @@ function loadSideCharacters() {
     document.getElementById('close').addEventListener('click', () => {
         document.getElementById('extended').style.display = 'none';
     });
+
+    function addMainCharacter() {
+    const data = {
+        name: document.getElementById('name').value,
+        father_name: document.getElementById('father_name').value,
+        alias: document.getElementById('alias').value,
+        trait: document.getElementById('trait').value,
+        weapon: document.getElementById('weapon').value,
+        skill: document.getElementById('skill').value,
+    };
+    if (!data.name) {
+        alert("Name is required.");
+        return;
+    }
+
+    fetch('/add_main_character', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById('add-result').innerText = data.message;
+
+        // Clear fields
+        ['name', 'father_name', 'alias', 'trait', 'weapon', 'skill'].forEach(id => {
+            document.getElementById(id).value = '';
+        });
+    });
+}
+
+
 
 </script>
 </body>
