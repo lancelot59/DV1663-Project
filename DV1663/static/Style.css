@@ -23,12 +23,14 @@ table tr {
     display: table-row;
 }
 table tr:nth-child(2n) {
-    background-color: #eee;
+    background-color: #858585;
 }
 tbody tr:hover {
     background-color: rgb(150, 150, 209);
 }
-
+h1 {
+    color:white;
+}
 
 /* ---===--- Popup window ---===--- */
 
