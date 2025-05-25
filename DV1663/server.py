@@ -6,18 +6,18 @@ import sqlite3  # Database
 app = Flask(__name__)
 
 # Connect to SQLite
-def get_gods():
-    conn = sqlite3.connect('projekt_dv1663.db')
-    cursor = conn.cursor()
-    cursor.execute( """SELECT g.name AS God, COUNT(r.Main_character) AS Number_of_Heroes, COUNT(h.ID) AS Helps_or_Hinders
-                        FROM gods g
-                        LEFT JOIN relation r ON g.name = r.God
-                        LEFT JOIN help_or_hinder h ON g.name = h.name
-                        GROUP BY g.name
-                        ORDER BY Number_of_Heroes DESC;""")
-    gods = cursor.fetchall()
-    conn.close()
-    return gods
+#def get_gods():
+#    conn = sqlite3.connect('projekt_dv1663.db')
+#    cursor = conn.cursor()
+#    cursor.execute( """SELECT g.name AS God, COUNT(r.Main_character) AS Number_of_Heroes, COUNT(h.ID) AS Helps_or_Hinders
+#                        FROM gods g
+#                        LEFT JOIN relation r ON g.name = r.God
+#                        LEFT JOIN help_or_hinder h ON g.name = h.name
+#                        GROUP BY g.name
+#                        ORDER BY Number_of_Heroes DESC;""")
+#    gods = cursor.fetchall()
+#    conn.close()
+#    return gods
 
 def get_details(item_id):
     conn = sqlite3.connect('projekt_dv1663.db')
@@ -143,15 +143,42 @@ def add_main_character(data):
     conn.close()
     return f"Main character '{data.get('name')}' added."
 
+def get_main_characters():
+    conn = sqlite3.connect('projekt_dv1663.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM main_character")
+    data = cursor.fetchall()
+    conn.close()
+    return data
+
+def get_adventures():
+    conn = sqlite3.connect('projekt_dv1663.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM adventures")
+    data = cursor.fetchall()
+    conn.close()
+    return data
+
+def get_side_characters():
+    conn = sqlite3.connect('projekt_dv1663.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM side_character")
+    data = cursor.fetchall()
+    conn.close()
+    return data
+
+def get_gods():
+    conn = sqlite3.connect('projekt_dv1663.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM gods")
+    data = cursor.fetchall()
+    conn.close()
+    return data
 
 # Routes
 @app.route('/')
 def form():
     return render_template('form.html', gods = get_gods())
-
-@app.route('/gods')
-def gods():
-    return jsonify(get_gods())
 
 @app.route('/main_char_adventures')
 def main_char_adventures():
@@ -170,7 +197,22 @@ def add_character():
     data = request.json
     return jsonify({"message": add_main_character(data)})
 
+@app.route('/main_characters')
+def main_characters():
+    return jsonify(get_main_characters())
 
+@app.route('/adventures')
+def adventures():
+    return jsonify(get_adventures())
+
+@app.route('/side_characters')
+def side_characters():
+    return jsonify(get_side_characters())
+
+
+@app.route('/gods')
+def gods():
+    return jsonify(get_gods())
 
 @app.route('/details/<item_id>')
 def details(item_id):
