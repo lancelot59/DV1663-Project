@@ -11,7 +11,9 @@
 <div class="container my-5">
     <h1 class="mb-4">Mythological Gods Overview</h1>
 
-    <div class="table-responsive">
+    <!-- === Table 1: Gods Overview === -->
+    <h3>Gods Overview</h3>
+    <div class="table-responsive mb-5">
         <table id="my-table" class="table table-striped table-bordered">
             <thead class="table-dark">
                 <tr>
@@ -22,7 +24,7 @@
             </thead>
             <tbody>
                 {% for god in gods %}
-                <tr data-name="{{ god[0] }}">
+                <tr class="god-row" data-name="{{ god[0] }}">
                     <td>{{ god[0] }}</td>
                     <td>{{ god[1] }}</td>
                     <td>{{ god[2] }}</td>
@@ -32,13 +34,155 @@
         </table>
     </div>
 
+    <!-- === Table 2: Main Characters & Adventures === -->
+    <h3>Main Characters and Adventures</h3>
+    <button class="btn btn-outline-primary mb-3" onclick="loadMainCharAdventures()">Load Data</button>
+    <div id="mainchar-table-container" class="table-responsive"></div>
+
+    <!-- === Table 3: God Interventions === -->
+    <h3>God Interventions</h3>
+    <button class="btn btn-outline-secondary mb-3" onclick="loadInterventions()">Load Data</button>
+    <div id="intervention-table-container" class="table-responsive"></div>
+
+    <!-- === God Summary Viewer === -->
     <div id="extended" class="position-fixed top-0 end-0 p-3 bg-light border rounded shadow" style="display:none; z-index:1050; width:300px;">
         <button id="close" type="button" class="btn-close float-end" aria-label="Close"></button>
         <div id="details" class="mt-3"></div>
     </div>
+
+    <!-- === Form: Add New Main Character === -->
+<h3 class="mt-5">Add a Main Character</h3>
+<div class="row g-3">
+    <div class="col-md-6">
+        <input type="text" id="name" class="form-control" placeholder="Name">
+    </div>
+    <div class="col-md-6">
+        <input type="text" id="father_name" class="form-control" placeholder="Father Name">
+    </div>
+    <div class="col-md-6">
+        <input type="text" id="alias" class="form-control" placeholder="Alias">
+    </div>
+    <div class="col-md-6">
+        <input type="text" id="trait" class="form-control" placeholder="Trait">
+    </div>
+    <div class="col-md-6">
+        <input type="text" id="weapon" class="form-control" placeholder="Weapon">
+    </div>
+    <div class="col-md-6">
+        <input type="text" id="skill" class="form-control" placeholder="Skill">
+    </div>
+</div>
+<button class="btn btn-success mt-3" onclick="addMainCharacter()">Add Character</button>
+<div id="add-result" class="mt-2 text-success"></div>
+
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="{{ url_for('static', filename='script.js') }}"></script>
+<script>
+    // Show god summary
+    document.querySelectorAll('.god-row').forEach(row => {
+        row.addEventListener('click', () => {
+            const godName = row.getAttribute('data-name');
+            fetch(`/god_summary/${godName}`)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('details').innerText = data.summary;
+                    document.getElementById('extended').style.display = 'block';
+                });
+        });
+    });
+
+    document.getElementById('close').addEventListener('click', () => {
+        document.getElementById('extended').style.display = 'none';
+    });
+
+    // Load Main Character Adventures
+    function loadMainCharAdventures() {
+        fetch('/main_char_adventures')
+            .then(res => res.json())
+            .then(data => {
+                const table = `
+                    <table class="table table-striped table-bordered">
+                        <thead class="table-secondary">
+                            <tr><th>Main Character</th><th>Adventures</th></tr>
+                        </thead>
+                        <tbody>
+                            ${data.map(row => `<tr><td>${row[0]}</td><td>${row[1]}</td></tr>`).join('')}
+                        </tbody>
+                    </table>`;
+                document.getElementById('mainchar-table-container').innerHTML = table;
+            });
+    }
+
+    // Load Interventions
+    function loadInterventions() {
+        fetch('/god_interventions')
+            .then(res => res.json())
+            .then(data => {
+                const table = `
+                    <table class="table table-striped table-bordered">
+                        <thead class="table-secondary">
+                            <tr><th>God</th><th>Interventions</th></tr>
+                        </thead>
+                        <tbody>
+                            ${data.map(row => `<tr><td>${row[0]}</td><td>${row[1]}</td></tr>`).join('')}
+                        </tbody>
+                    </table>`;
+                document.getElementById('intervention-table-container').innerHTML = table;
+            });
+    }
+
+    // Add new main character
+    function addMainCharacter() {
+        const data = {
+            name: document.getElementById('name').value,
+            father_name: document.getElementById('father_name').value,
+            alias: document.getElementById('alias').value,
+            trait: document.getElementById('trait').value,
+            weapon: document.getElementById('weapon').value,
+            skill: document.getElementById('skill').value,
+        };
+
+        // Simple form validation
+        if (!data.name) {
+            alert("Name is required.");
+            return;
+        }
+
+        fetch('/add_main_character', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('add-result').innerText = data.message;
+
+            // Clear fields
+            ['name', 'father_name', 'alias', 'trait', 'weapon', 'skill'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
+        });
+    }
+
+    // Load character log
+    function loadCharacterLog() {
+        fetch('/character_log')
+            .then(res => res.json())
+            .then(data => {
+                const table = `
+                    <table class="table table-striped table-bordered">
+                        <thead class="table-secondary">
+                            <tr><th>ID</th><th>Name</th><th>Timestamp</th></tr>
+                        </thead>
+                        <tbody>
+                            ${data.map(row => `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td></tr>`).join('')}
+                        </tbody>
+                    </table>`;
+                document.getElementById('log-table-container').innerHTML = table;
+            });
+    }
+</script>
 </body>
 </html>
