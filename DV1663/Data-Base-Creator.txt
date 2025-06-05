@@ -1,0 +1,143 @@
+--
+-- Databas: projekt_dv1663
+--
+
+-- --------------------------------------------------------
+
+--
+-- Tabellstruktur adventures
+--
+
+CREATE TABLE adventures (
+  ID INTEGER PRIMARY KEY AUTOINCREMENT,
+  Goal TEXT NOT NULL,
+  Brief TEXT NOT NULL,
+  Name TEXT NOT NULL
+);
+
+-- --------------------------------------------------------
+
+--
+-- Tabellstruktur interacts
+--
+
+CREATE TABLE interacts (
+  Main_character TEXT NOT NULL,
+  Side_character TEXT NOT NULL,
+  Relation TEXT NOT NULL,
+  PRIMARY KEY (Main_character, Side_character),
+  FOREIGN KEY (Side_character) REFERENCES side_character(Name),
+  FOREIGN KEY (Main_character) REFERENCES main_character(Name)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Tabellstruktur gods
+--
+
+CREATE TABLE gods (
+  Name TEXT PRIMARY KEY,
+  Father TEXT DEFAULT NULL,
+  Mother TEXT DEFAULT NULL,
+  God_of TEXT NOT NULL
+);
+
+-- --------------------------------------------------------
+
+--
+-- Tabellstruktur gose
+--
+
+CREATE TABLE gose (
+  Main_Character TEXT NOT NULL,
+  Adventure INTEGER NOT NULL,
+  PRIMARY KEY (Main_character, Adventure),
+  FOREIGN KEY (Adventure) REFERENCES Adventure(ID),
+  FOREIGN KEY (Main_character) REFERENCES main_character(Name)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Tabellstruktur help/hinder
+--
+
+CREATE TABLE help_or_hinder (
+  Name TEXT NOT NULL,
+  ID INTEGER NOT NULL,
+  PRIMARY KEY (Name, ID),
+  FOREIGN KEY (ID) REFERENCES adventure(ID),
+  FOREIGN KEY (Name) REFERENCES gods(Name)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Tabellstruktur helps
+--
+
+CREATE TABLE helps (
+  Name TEXT NOT NULL,
+  ID INTEGER NOT NULL,
+  PRIMARY KEY (Name, ID),
+  FOREIGN KEY (ID) REFERENCES adventure(ID),
+  FOREIGN KEY (Name) REFERENCES side_character(Name)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Tabellstruktur main_character
+--
+
+CREATE TABLE main_character (
+  Name TEXT PRIMARY KEY,
+  Last_Name TEXT NOT NULL,
+  Alias TEXT NOT NULL,
+  Trait TEXT NOT NULL,
+  Weapon TEXT NOT NULL,
+  Skill TEXT NOT NULL
+);
+
+-- --------------------------------------------------------
+
+--
+-- Tabellstruktur relation
+--
+
+CREATE TABLE relation (
+  Main_character TEXT NOT NULL,
+  God TEXT NOT NULL,
+  Relation TEXT NOT NULL,
+  PRIMARY KEY (Main_character, God),
+  FOREIGN KEY (Main_character) REFERENCES main_character(Name),
+  FOREIGN KEY (God) REFERENCES gods(Name)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Tabellstruktur siblings
+--
+
+CREATE TABLE siblings (
+  Older TEXT NOT NULL,
+  Junger TEXT NOT NULL,
+  PRIMARY KEY (Older, Junger),
+  FOREIGN KEY (Older) REFERENCES gods(Name),
+  FOREIGN KEY (Junger) REFERENCES gods(Name)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Tabellstruktur side_character
+--
+
+CREATE TABLE side_character (
+  Name TEXT PRIMARY KEY,
+  Skill TEXT NOT NULL,
+  Trait TEXT NOT NULL
+);
+
